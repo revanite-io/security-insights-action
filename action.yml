@@ -1,0 +1,29 @@
+---
+name: Validate Security Insights
+description: Validate a security-insights.yml file against the official OSSF Security Insights CUE schema
+
+inputs:
+  file:
+    description: Path to the security-insights.yml file
+    required: false
+    default: .github/security-insights.yml
+
+runs:
+  using: composite
+  steps:
+    - uses: cue-lang/setup-cue@v1.0.1
+    - name: Extract schema version
+      id: version
+      shell: bash
+      run: |
+        VERSION=$(yq '.header.schema-version' "${{ inputs.file }}")
+        echo "schema-version=$VERSION" >> "$GITHUB_OUTPUT"
+    - name: Download schema
+      shell: bash
+      run: |
+        curl -fsSL \
+          "https://raw.githubusercontent.com/ossf/security-insights/v${{ steps.version.outputs.schema-version }}/spec/schema.cue" \
+          -o schema.cue
+    - name: Validate
+      shell: bash
+      run: cue vet schema.cue "${{ inputs.file }}"
