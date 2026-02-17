@@ -33,14 +33,14 @@ jobs:
           persist-credentials: false
 
       - name: Validate Security Insights
-        uses: revanite-io/security-insights-action@main
+        uses: revanite-io/security-insights-action@v1.0.0
 ```
 
 ### Custom File Path
 
 ```yaml
       - name: Validate Security Insights
-        uses: revanite-io/security-insights-action@main
+        uses: revanite-io/security-insights-action@v1.0.0
         with:
           file: path/to/security-insights.yml
 ```
