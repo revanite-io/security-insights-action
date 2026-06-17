@@ -9,14 +9,23 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Clone the repository
     steps:
-      - uses: actions/checkout@v6
+      - uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -25,13 +34,19 @@ jobs:
 
   reject-invalid:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Clone the repository
     strategy:
       matrix:
         file:
           - testdata/invalid-v2.1.0.yml
           - testdata/invalid-v2.2.0.yml
     steps:
-      - uses: actions/checkout@v6
+      - uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
