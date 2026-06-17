@@ -22,3 +22,29 @@ jobs:
 
       - name: Validate Security Insights
         uses: ./
+
+  reject-invalid:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        file:
+          - testdata/invalid-v2.1.0.yml
+          - testdata/invalid-v2.2.0.yml
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Validate (expect failure)
+        id: validate
+        uses: ./
+        with:
+          file: ${{ matrix.file }}
+        continue-on-error: true
+
+      - name: Assert validation failed
+        if: steps.validate.outcome == 'success'
+        shell: bash
+        run: |
+          echo "::error::Validation should have failed for ${{ matrix.file }}"
+          exit 1

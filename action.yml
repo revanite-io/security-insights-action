@@ -21,9 +21,16 @@ runs:
     - name: Download schema
       shell: bash
       run: |
-        curl -fsSL \
-          "https://raw.githubusercontent.com/ossf/security-insights/v${{ steps.version.outputs.schema-version }}/spec/schema.cue" \
-          -o schema.cue
+        VERSION="${{ steps.version.outputs.schema-version }}"
+        BASE="https://raw.githubusercontent.com/ossf/security-insights/v${VERSION}"
+        if ! curl -fsSL "${BASE}/spec/schema.cue" -o schema.cue 2>/dev/null; then
+          curl -fsSL "${BASE}/schema.cue" -o schema.cue
+        fi
     - name: Validate
       shell: bash
-      run: cue vet schema.cue "${{ inputs.file }}"
+      run: |
+        if grep -q '^#SecurityInsights:' schema.cue; then
+          cue vet -d '#SecurityInsights' schema.cue "${{ inputs.file }}"
+        else
+          cue vet schema.cue "${{ inputs.file }}"
+        fi
