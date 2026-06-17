@@ -1,0 +1,8 @@
+header:
+  schema-version: 2.2.0
+  last-updated: "2026-03-17"
+  last-reviewed: "2026-03-17"
+  url: https://example.com/security-insights.yml
+project:
+  name: Test Project
+  homepage: https://example.com
